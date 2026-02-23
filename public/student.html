@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Student Dashboard</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+/* Sidebar slide-in */
+#sidebar{position:fixed;left:0;top:0;height:100vh;transform:translateX(-260px);transition:transform .25s;z-index:1050;width:250px}
+#sidebar.open{transform:translateX(0)}
+#overlay{position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:1040;display:none}
+#overlay.show{display:block}
+/* Hamburger */
+.hamburger{width:36px;height:24px;padding:6px;border:none;background:transparent}
+.hamburger span{display:block;height:3px;background:#000;margin:4px 0;border-radius:2px}
+/* ensure main content has left padding when sidebar visible on large screens */
+.main-content{padding-left:0;width:100%}
+/* Header height */
+.app-header{position:fixed;top:0;left:0;right:0;height:56px;z-index:1060;background:#fff;display:flex;align-items:center;padding:0 16px;box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+.app-title{margin:0 0 0 12px;font-size:1.125rem;font-weight:600}
+/* main content offset for header */
+.main-content{padding-top:56px}
+/* Keep sidebar hidden by default on all screen sizes; it appears only when toggled */
+</style>
+</head>
+<body>
+
+<div id="sidebar" class="bg-dark text-white p-3">
+    <h4>🎓 OJT Tracker</h4>
+    <hr>
+    <a class="text-white d-block mb-2">Student Dashboard</a>
+    <a href="#" onclick="logout()" class="text-danger">Logout</a>
+</div>
+
+<div id="overlay"></div>
+
+<!-- Header with hamburger and title -->
+<header class="app-header">
+    <button id="hamburger" class="hamburger" aria-label="Toggle sidebar">
+        <span></span><span></span><span></span>
+    </button>
+    <h5 class="app-title">ESSU OJT Tracker</h5>
+</header>
+
+<div class="main-content">
+    <div class="container-fluid p-4">
+
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5>Total Hours: <span id="totalHours">0</span> / 500</h5>
+                <div class="progress">
+                    <div id="progressBar" class="progress-bar bg-success" style="width:0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5>Log Time</h5>
+                <input type="time" id="start" class="form-control mb-2">
+                <input type="time" id="end" class="form-control mb-2">
+                <button onclick="logTime()" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5>Weekly Hours</h5>
+                <canvas id="weeklyChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-body">
+                <h5>Daily Records</h5>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Start</th>
+                            <th>End</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recordsTable"></tbody>
+                </table>
+
+                <button class="btn btn-warning" onclick="exportPDF()">Export PDF</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

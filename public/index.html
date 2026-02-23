@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OJT Tracker</title>
+</head>
+<body>
+<script>
+const token = localStorage.getItem("token");
+
+if (!token) {
+    window.location = "login.html";
+} else {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+
+    if (payload.role === "student")
+        window.location = "student.html";
+    else if (payload.role === "admin")
+        window.location = "admin.html";
+    else
+        window.location = "supervisor.html";
+}
+</script>
+</body>
+</html>
