@@ -1,5 +1,12 @@
 const token = localStorage.getItem("token");
 
+// API base: use explicit localhost URL during local dev, otherwise same-origin
+const API_BASE = (location.hostname === 'localhost' || location.hostname === '127.0.0.1') ? 'http://localhost:3000' : '';
+
+function apiFetch(path, opts){
+    return fetch(API_BASE + path, opts);
+}
+
 function logout(){
     localStorage.removeItem("token");
     window.location="login.html";
@@ -10,7 +17,7 @@ async function logTime(){
     const start=document.getElementById("start").value;
     const end=document.getElementById("end").value;
 
-    await fetch("/time-log",{
+    await apiFetch("/time-log",{
         method:"POST",
         headers:{
             "Content-Type":"application/json",
@@ -23,7 +30,7 @@ async function logTime(){
 }
 
 async function loadStudent(){
-    const res=await fetch("/student/me",{headers:{"Authorization":token}});
+    const res=await apiFetch("/student/me",{headers:{"Authorization":token}});
     const data=await res.json();
 
     document.getElementById("totalHours").innerText=data.total;
@@ -73,7 +80,7 @@ async function editLog(id, oldStart, oldEnd){
     const newEnd = prompt("Edit End Time:", oldEnd);
     if(!newStart || !newEnd) return;
 
-    await fetch(`/time-log/${id}`,{
+    await apiFetch(`/time-log/${id}`,{
         method:"PUT",
         headers:{
             "Content-Type":"application/json",
@@ -88,7 +95,7 @@ async function editLog(id, oldStart, oldEnd){
 // Delete a time log (student)
 async function deleteLog(id){
     if(!confirm("Delete this record?")) return;
-    await fetch(`/time-log/${id}`,{
+    await apiFetch(`/time-log/${id}`,{
         method:"DELETE",
         headers:{"Authorization":token}
     });
@@ -97,7 +104,7 @@ async function deleteLog(id){
 
 // Export student's records to PDF
 function exportPDF(){
-    window.open("/export","_blank");
+    window.open(API_BASE + "/export","_blank");
 }
 
 // ================= ADMIN =================
@@ -105,7 +112,7 @@ async function loadAdmin(){
     const filterEl = document.getElementById('courseFilter');
     const course = filterEl ? filterEl.value : '';
     const url = course ? `/admin/students?course=${encodeURIComponent(course)}` : '/admin/students';
-    const res=await fetch(url,{headers:{"Authorization":token}});
+    const res=await apiFetch(url,{headers:{"Authorization":token}});
     const students=await res.json();
 
     const table=document.getElementById("studentTable");
@@ -128,7 +135,7 @@ async function loadAdmin(){
 
 // ================= SUPERVISOR =================
 async function loadPending(){
-    const res=await fetch("/supervisor/pending",{headers:{"Authorization":token}});
+    const res=await apiFetch("/supervisor/pending",{headers:{"Authorization":token}});
     const logs=await res.json();
 
     const table=document.getElementById("pendingTable");
@@ -150,7 +157,7 @@ async function loadPending(){
 }
 
 async function approve(id){
-    await fetch("/approve/"+id,{
+    await apiFetch("/approve/"+id,{
         method:"PUT",
         headers:{"Authorization":token}
     });
@@ -161,7 +168,7 @@ async function approve(id){
 async function resetPassword(){
     const email=document.getElementById("resetEmail").value;
 
-    await fetch("/reset-request",{
+    await apiFetch("/reset-request",{
         method:"POST",
         headers:{"Content-Type":"application/json"},
         body:JSON.stringify({email})

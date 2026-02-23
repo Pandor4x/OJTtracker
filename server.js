@@ -10,13 +10,23 @@ const app = express();
 app.use(bodyParser.json());
 app.use(express.static("public"));
 
-const pool = new Pool({
-    user: "postgres",
-    host: "localhost",
-    database: "ojt_tracker",
-    password: "yourpassword",
-    port: 5432
-});
+// Prefer DATABASE_URL (e.g. Supabase) when provided, otherwise use individual PG env vars
+const connectionString = process.env.DATABASE_URL;
+let pool;
+if (connectionString) {
+    pool = new Pool({
+        connectionString,
+        ssl: { rejectUnauthorized: false }
+    });
+} else {
+    pool = new Pool({
+        user: process.env.PGUSER || 'postgres',
+        host: process.env.PGHOST || 'localhost',
+        database: process.env.PGDATABASE || 'ojt_tracker',
+        password: process.env.PGPASSWORD || 'yourpassword',
+        port: parseInt(process.env.PGPORT || '5432', 10)
+    });
+}
 
 const SECRET = "SECRETKEY";
 
@@ -279,4 +289,5 @@ async (req,res)=>{
     doc.end();
 });
 
-app.listen(3000,()=>console.log("Server running on 3000"));
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, ()=>console.log(`Server running on ${PORT}`));
